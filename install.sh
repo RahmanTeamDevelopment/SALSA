@@ -7,7 +7,7 @@ PIP_ARGS='--no-cache-dir --ignore-installed --force-reinstall'
 VERSION="$(python -c "from main.version import __version__; print __version__")"
 
 echo ""
-echo "Installing ENSTWriter $VERSION ..."
+echo "Installing SALSA $VERSION ..."
 echo ""
 
 
@@ -33,8 +33,9 @@ cd CoverView-1.4.3
 
 
 
-
 ### Installing SALSA wraper for the full set of tools
+cd ${ABSOLUTE_PATH}
+
 virtualenv -p python2.7 env
 
 source ${ABSOLUTE_PATH}/env/bin/activate
