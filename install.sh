@@ -31,12 +31,18 @@ echo ""
 
 
 message "Installing CAVA v1.2.3"
+cd ${ABSOLUTE_PATH}/tools/Platypus/
+./install.sh
+echo ""
+
+
+message "Installing Platypus v0.2.4"
 cd ${ABSOLUTE_PATH}/tools/
-wget https://github.com/RahmanTeam/CAVA/archive/v1.2.3.tar.gz
-mv v1.2.3.tar.gz CAVA-v1.2.3.tar.gz
-tar xvf CAVA-v1.2.3.tar.gz
-rm CAVA-v1.2.3.tar.gz
-cd CAVA-1.2.3
+wget https://github.com/RahmanTeamDevelopment/CoverView/archive/v1.4.3.tar.gz
+mv v1.4.3.tar.gz CoverView-v1.4.3.tar.gz
+tar xvf CoverView-v1.4.3.tar.gz
+rm CoverView-v1.4.3.tar.gz
+cd CoverView-1.4.3
 ./install.sh
 echo ""
 

@@ -1,0 +1,5 @@
+#!/bin/bash
+unset PYTHONPATH
+ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source $ABSOLUTE_PATH/env/bin/activate
+$ABSOLUTE_PATH/env/bin/python $ABSOLUTE_PATH/Platypus_0.2.4/Platypus.py $*
