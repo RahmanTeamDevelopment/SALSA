@@ -44,7 +44,7 @@ ver = __version__
 # Command line argument parsing
 parser = OptionParser(description='Configure script for SALSA v{}'.format(__version__), usage='configure_salsa.py <options>', version=__version__)
 parser.add_option('--reference', default=None, dest='reference', action='store', help="Required: Input reference file (GRCh37) [default value: %default]")
-parser.add_option('--salsa_config', default=None, dest='salsa_config', action='store', help="Required: SALSA configuration INI file to set up SALSA before running [default value: %default]")
+parser.add_option('--salsa_config', default=scriptdir+"/default.ini", dest='salsa_config', action='store', help="Required: SALSA configuration INI file to set up SALSA before running [default value: %default]")
 parser.add_option('--no_indexing', default=False, dest='no_indexing', action='store_true', help="Optional: Specify if you want to reconfigure SALSA Configuration files [default value: %default]")
 
 
@@ -74,8 +74,10 @@ if not options.no_indexing:
 
 
 # Create CAVA config
-generate.cava_configuration(scriptdir+"/templates/cava_config_template", scriptdir+"/cava_config.txt", ref_with_path, ini_dict)
+generate.cava_configuration(scriptdir+"/templates/cava_config_template", scriptdir+"/config_files/cava_config.txt", ref_with_path, ini_dict)
 
+# Create CoverView config
+generate.coverview_configuration(scriptdir+"/config_files/coverview_config.json", ini_dict)
 
 
 
@@ -84,23 +86,6 @@ generate.cava_configuration(scriptdir+"/templates/cava_config_template", scriptd
 #config.write('ENSTDB = '+scriptdir+'/ensembl_release65_TSCP_fixedWT1.gz\n')
 #config.write('CAVA_CONFIG = '+scriptdir+'/cava_config.txt\n')
 
-# CoverView config files
-#call(['cp','templates/coverview_config_template','CoverView_default.json'])
-#defaultconfig=open('CoverView_default.json', "a")
-#defaultconfig.write('\t\"transcript\":  {\"regions\": false, \"profiles\": false, \"poor\": true }\n}\n')
-#defaultconfig.close()
-
-# CAVA config file
-#call(['cp','templates/cava_config_template','cava_config.txt'])
-#cavaconfig=open('cava_config.txt', "a")
-#cavaconfig.write('# Name of Ensembl transcript database file\n')
-#cavaconfig.write('# Possible values: string | Optional: yes (if not given, no transcript-based annotations are reported)\n')
-#cavaconfig.write('@ensembl = '+scriptdir+'/ensembl_release65_TSCP_fixedWT1.gz\n')
-#if not options.reference is None: 
-#	cavaconfig.write('\n# Name of reference genome file\n')
-#	cavaconfig.write('# Possible values: string | Optional: no\n')
-#	cavaconfig.write('@reference = '+refdir+'\n')
-#cavaconfig.close()
 
 # Call index_genome.sh and add reference fields to config file
 #if not options.reference is None: 

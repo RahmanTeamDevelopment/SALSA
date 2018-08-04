@@ -8,7 +8,7 @@
 
 # Name of dbSNP database file. 
 # Possible values: string | Optional: yes (if not given, no SNP-based annotations are reported)
-@dbsnp = 
+@dbsnp = .
 
 # Are variants with neither transcript nor dbSNP annotations to be included in the output?
 # Possible values: TRUE or FALSE | Optional: yes | Default value: TRUE
@@ -24,7 +24,7 @@
 
 # Name of compressed BED file specifying genomic regions variant annotation is restricted to
 # Possible values: string | Optional: yes
-@target = 
+@target = .
 
 # Name of file providing a list of the gene identifiers variant annotation is restricted to
 # Note: gene identifiers need to be given on separate lines in the file
@@ -70,8 +70,8 @@
 
 # Name of Ensembl transcript database file
 # Possible values: string | Optional: yes (if not given, no transcript-based annotations are reported)
-@ensembl = 
+@ensembl = .
 
 # Name of reference genome file
 # Possible values: string | Optional: no
-@reference = 
+@reference = .
