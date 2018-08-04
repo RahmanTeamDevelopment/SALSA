@@ -3,6 +3,7 @@
 from optparse import OptionParser
 from subprocess import call
 import os
+import sys
 from main.version import __version__
 
 
@@ -19,14 +20,16 @@ def parse_config_file(fn):
 				if '[' in s or ']' in s or '=' in s: continue
 				section = s
 
-				elif line.count('=') == 1:
-					key, value = line.split('=')
-					key = key.strip()
-					value = value.strip()
-					if section != '':
-						key = '{}.{}'.format(section, key)
-					ret[key] = value
+			elif line.count('=') == 1:
+				key, value = line.split('=')
+				key = key.strip()
+				value = value.strip()
+				if section != '':
+					key = '{}.{}'.format(section, key)
+				ret[key] = value
 	return ret
+
+
 
 
 ##############################################################################################################
@@ -41,45 +44,58 @@ ver = __version__
 descr='Installer script of SALSA '+ver+'.'
 
 parser = OptionParser(description='Configure script for SALSA v{}'.format(__version__), usage='configure_salsa.py <options>', version=__version__)
-parser.add_option('--reference', default=None, dest='reference', action='store', help="Input reference file (GRCh37) [default value: %default]")
-#parser.add_option('--ensembl', default=None, dest='ensembl', action='store', help="Ensembl transcript database")
-#parser.add_option('--series', default=None, dest='series', action='store', help="Series code (e.g. CART37A)")
-#parser.add_option('--output', default='output', dest='output', action='store', help="Output file name prefix [default value: %default]")
-#parser.add_option('--gbk', default=False, dest='gbk', action='store_true', help="Create GBK output [default value: %default]")
-#parser.add_option('--ref', default=None, dest='ref', action='store', help="Reference genome file")
-#parser.add_option('--annovar', default=False, dest='annovar', action='store_true', help="Create GenePred and FASTA files for Annovar [default value: %default]")
-#parser.add_option('--prev_cava_db', default=None, dest='prev_cava_db', action='store', help="CAVA db output of previous run from which CART numbering will be continued")
-#parser.add_option('--prev_ref', default=None, dest='prev_ref', action='store', help="Reference genome of previous run from which CART numbering will be continued")
-(options, args) = parser.parse_args()
+parser.add_option('--reference', default=None, dest='reference', action='store', help="Required: Input reference file (GRCh37) [default value: %default]")
+parser.add_option('--salsa_config', default=None, dest='salsa_config', action='store', help="Required: SALSA configuration INI file to set up SALSA before running [default value: %default]")
+parser.add_option('--no_indexing', default=False, dest='no_indexing', action='store_true', help="Optional: Specify if you want to reconfigure SALSA Configuration files [default value: %default]")
 
+
+(options, args) = parser.parse_args()
+ini_dict = parse_config_file(options.salsa_config)
+
+#set default transcript and reference file
+default_transcripts = scriptdir+"/ensembl_release65_TSCP_fixedWT1.gz"
+if ini_dict['transcript'] == ".": ini_dict['transcript']=default_transcripts
 
 # Reference directory
 refdir=''
 if not options.reference is None:
-	refdir=os.path.abspath(options.reference)
-	print refdir
+	ref_with_path=os.path.abspath(options.reference)
 else:
 	print parser.print_help()
 	sys.exit("\n\nError: Please provide reference file (--reference)\n\n")
 
-# Print welcome message
-print '\n-----------------------------------------'
-print ' Configuring SALSA reference files'
-print '-----------------------------------------\n'
-print 'NOTE: the reference genome is being indexed by BWA and Stampy that will take a while.\n'
-sys.exit()
-call(['./index_genome.sh',refdir])
+#print '\n-----------------------------------------'
+#print ' Configuring SALSA reference files'
+#print '-----------------------------------------\n'
+#print 'NOTE: the reference genome is being indexed by BWA and Stampy that will take a while.\n'
+#if not options.no_indexing: call(['./index_genome.sh',ref_with_path])
 
 
 
+# Create CAVA config
+call(['cp', scriptdir+"/templates/cava_config_template", scriptdir+"/cava_config.txt"])
+read_file = open(scriptdir+"/templates/cava_config_template", 'r')
+write_file = open(scriptdir+"/cava_config.txt", 'w')
+for line in read_file:
+	line = line.rstrip()
+	if line.startswith("@"):
+		if line.startswith("@dbsnp"):
+			write_file.write(line+" "+options.cava_dbsnp+"\n")
+		elif line.startswith("@target"):
+			write_file.write(line+" "+options.cava_target+"\n")
+		elif line.startswith("@ensembl"):
+			write_file.write(line+" "+options.cava_database+"\n")
+		elif line.startswith("@reference"):
+			write_file.write(line+" "+ref_with_path+"\n")
+		else:
+			write_file.write(line+"\n")
+	else:
+		write_file.write(line+"\n")
+read_file.close()
+write_file.close()
+	
 
 
-# Call build_topex.sh script
-#print '\n---------------------------------------------------------------------------------'
-#print 'Downloading and building components (BWA, Stampy, CoverView, Platypus, CAVA) ...'
-#print '---------------------------------------------------------------------------------\n'
-#call(['chmod','+x','./build_topex.sh'])
-#call(['./build_topex.sh'])
 
 # Create config file
 #config=open('config.txt', "wt")

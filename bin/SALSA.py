@@ -1,8 +1,17 @@
 #!env/bin/python
 
-#from main.cli import start_cli
-#
-#start_cli()
+import main
+import optparse
+import OptionParser
+from main.version import __version__
+import os
 
-##Still need to make the installation and wraper script to SALSA.  Can take the one I already have and apply it here maybe.
-print "hello world I am working..."
+scriptdir=os.path.dirname(os.path.realpath(__file__))
+
+if not os.path.isfile(scriptdir+"/config_files/cava_config.txt"):
+	sys.exit("Error: No CAVA configuration file.  Please run 'configure.py' before running SALSA")
+if not os.path.isfile(scriptdir+"/config_files/coverview_config.json"):
+	sys.exit("Error: No CoverView configuration file.  Please run 'configure.py' before running SALSA")
+	
+	
+
