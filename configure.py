@@ -5,6 +5,7 @@ from subprocess import call
 import os
 import sys
 from main.version import __version__
+from main import generate
 
 
 def parse_config_file(fn):
@@ -41,8 +42,6 @@ scriptdir=os.path.dirname(os.path.realpath(__file__))
 ver = __version__
 
 # Command line argument parsing
-descr='Installer script of SALSA '+ver+'.'
-
 parser = OptionParser(description='Configure script for SALSA v{}'.format(__version__), usage='configure_salsa.py <options>', version=__version__)
 parser.add_option('--reference', default=None, dest='reference', action='store', help="Required: Input reference file (GRCh37) [default value: %default]")
 parser.add_option('--salsa_config', default=None, dest='salsa_config', action='store', help="Required: SALSA configuration INI file to set up SALSA before running [default value: %default]")
@@ -54,7 +53,7 @@ ini_dict = parse_config_file(options.salsa_config)
 
 #set default transcript and reference file
 default_transcripts = scriptdir+"/ensembl_release65_TSCP_fixedWT1.gz"
-if ini_dict['transcript'] == ".": ini_dict['transcript']=default_transcripts
+if ini_dict['transcript_db'] == ".": ini_dict['transcript_db']=default_transcripts
 
 # Reference directory
 refdir=''
@@ -64,36 +63,19 @@ else:
 	print parser.print_help()
 	sys.exit("\n\nError: Please provide reference file (--reference)\n\n")
 
-#print '\n-----------------------------------------'
-#print ' Configuring SALSA reference files'
-#print '-----------------------------------------\n'
-#print 'NOTE: the reference genome is being indexed by BWA and Stampy that will take a while.\n'
-#if not options.no_indexing: call(['./index_genome.sh',ref_with_path])
+
+if not options.no_indexing:
+	print '\n-----------------------------------------'
+	print ' Configuring SALSA reference files'
+	print '-----------------------------------------\n'
+	print 'NOTE: the reference genome is being indexed by BWA and Stampy that will take a while.\n'
+	call(['./index_genome.sh',ref_with_path])
 
 
 
 # Create CAVA config
-call(['cp', scriptdir+"/templates/cava_config_template", scriptdir+"/cava_config.txt"])
-read_file = open(scriptdir+"/templates/cava_config_template", 'r')
-write_file = open(scriptdir+"/cava_config.txt", 'w')
-for line in read_file:
-	line = line.rstrip()
-	if line.startswith("@"):
-		if line.startswith("@dbsnp"):
-			write_file.write(line+" "+options.cava_dbsnp+"\n")
-		elif line.startswith("@target"):
-			write_file.write(line+" "+options.cava_target+"\n")
-		elif line.startswith("@ensembl"):
-			write_file.write(line+" "+options.cava_database+"\n")
-		elif line.startswith("@reference"):
-			write_file.write(line+" "+ref_with_path+"\n")
-		else:
-			write_file.write(line+"\n")
-	else:
-		write_file.write(line+"\n")
-read_file.close()
-write_file.close()
-	
+generate.cava_configuration(scriptdir+"/templates/cava_config_template", scriptdir+"/cava_config.txt", ref_with_path, ini_dict)
+
 
 
 
