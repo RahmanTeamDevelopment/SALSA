@@ -18,7 +18,7 @@ ${ABSOLUTE_PATH}/tools/samtools-0.1.19/samtools faidx $1; echo
 # Index genome by Stampy
 message "Indexing genome by Stampy"
 mkdir ${ABSOLUTE_PATH}/index
-${ABSOLUTE_PATH}/tools/stampy-1.0.20/stampy.py --species=human --assembly=hg19_ncbi37 -G index/ref $1; echo
-${ABSOLUTE_PATH}/tools/stampy-1.0.20/stampy.py -g index/ref -H index/ref; echo
+${ABSOLUTE_PATH}/tools/stampy-1.0.20/stampy.py --species=human --assembly=hg19_ncbi37 -G index/GRCh37 $1; echo
+${ABSOLUTE_PATH}/tools/stampy-1.0.20/stampy.py -g index/GRCh37 -H index/GRCh37; echo
 
 
