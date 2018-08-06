@@ -1,15 +1,15 @@
 #!env/bin/python
 
 import main
-import optparse
-import OptionParser
+from optparse import OptionParser
 from main.version import __version__
 import os
+import sys
 
 scriptdir=os.path.dirname(os.path.realpath(__file__))
 
 if not os.path.isdir(scriptdir+"/config_files/"):
-	sys.exit("Error: No directory %s. Please configure SALSA by running 'configure.py' before using SALSA")
+	sys.exit("Error: No default configurations directory %s. Please configure SALSA by running 'configure.py' before using SALSA" % (scriptdir+"/config_files/"))
 if not os.path.isfile(scriptdir+"/config_files/cava_config.txt"):
 	sys.exit("Error: No CAVA configuration file.  Please configure SALSA by running 'configure.py' before using SALSA")
 if not os.path.isfile(scriptdir+"/config_files/coverview_config.json"):
