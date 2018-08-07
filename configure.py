@@ -104,6 +104,5 @@ generate.cava_configuration(scriptdir+"/templates/cava_config_template", scriptd
 generate.coverview_configuration(scriptdir+"/config_files/coverview_config.json", ini_dict)
 
 # Create TOpEx config
-generate.topex_configuration(scriptdir+"/config_files/topex_config.ini", options.reference, scriptdir, options.bed)
-
+generate.topex_configuration(scriptdir+"/config_files/topex_config.ini", ini_dict, options.reference, scriptdir, options.bed)
 
