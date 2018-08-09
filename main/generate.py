@@ -54,6 +54,5 @@ def topex_configuration(out, ini_dict, ref_with_path, salsa_dir, bed):
 	out_file.write("cava_config="+salsa_dir+"/config_files/cava_config.txt\n")
 	out_file.write("keep_all_files="+ini_dict["topex.keep_all_files"]+"\n")
 	out_file.write("output_all_variants="+ini_dict["topex.output_all_variants"]+"\n")
-	out_file.write("threads="+ini_dict["topex.threads"]+"\n")
 	out_file.close()
 

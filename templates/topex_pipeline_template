@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# Print out message and write to log file
+message () {
+echo; printf '%.0s=' {1..80}; echo
+echo "TOpEx: $1"
+printf '%.0s=' {1..80}; echo; echo
+echo "$(date "+%d.%m.%Y %T") : $1" >> @NAME_topex_log.txt
+}
+
+# Check if files exist and terminate TOpEx if required
+checkFiles () {
+for file in "$@"
+do
+    if ! [ -e $file ]
+    then
+	echo "TOpEx error: $file does not exist."
+	echo "Cannot proceed with this step. TOpEx run terminated."
+	echo "$(date "+%d.%m.%Y %T") : $file does not exist, cannot proceed. TOpEx run terminated" >> @NAME_topex_log.txt
+	exit
+    fi
+done
+}
+
+salsadir=@SALSADIR
+
+cd @OUTPATH
+
+echo "$(date "+%d.%m.%Y %T") : Pipeline started" >> @NAME_topex_log.txt
+
+# Mapping reads with BWA and Stampy, converting output to BAM file which is then sorted and indexed
+message "Mapping reads, converting output to BAM file, sorting and indexing BAM"
+checkFiles @FASTQ1 @FASTQ2
+mkdir @NAME_tmp
+$salsadir/tools/stampy-1.0.20/stampy.py --bwa=$salsadir/tools/bwa-0.7.5a/bwa --bwaoptions="-q 10 @REFERENCE" -g @STAMPYINDEX -h @STAMPYINDEX --bwatmpdir=./@NAME_tmp -M @FASTQ1 @FASTQ2 | $salsadir/tools/samtools-0.1.19/samtools view -Shb - > @NAME.bam
+
+# Checking if number of reads is the same in the FASTQ files and in the BAM file
+message "Comparing number of reads in FASTQ and BAM files"
+checkFiles @FASTQ1 @NAME.bam
+fastqr=$(echo $(zcat @FASTQ1 | wc -l)/2 | bc)
+bamr=$($salsadir/tools/samtools-0.1.19/samtools view @NAME.bam | wc -l)
+if [ $fastqr != $bamr ]; then echo FASTQ has $fastqr reads, BAM has $bamr reads; fi
+
+# Sort Bam file
+message "Sorting BAM file"
+checkFiles @NAME.bam
+java -Xmx4g -jar $salsadir/tools/picard-tools-1.90/SortSam.jar I=@NAME.bam O=@NAME_sorted.bam SORT_ORDER=coordinate TMP_DIR=./@NAME_tmp
+
+
+# Duplicate marking by Picard
+message "Duplicate marking"
+checkFiles @NAME_sorted.bam
+java -Xmx4g -jar $salsadir/tools/picard-tools-1.90/MarkDuplicates.jar I=@NAME_sorted.bam O=@NAME_sorted_picard.bam METRICS_FILE=@NAME_picard_metrics.txt CREATE_INDEX=true TMP_DIR=./@NAME_tmp
+
+mv @NAME_sorted_picard.bai @NAME_sorted_picard.bam.bai
+
+# Remove old bam files to clean up space
+message "removing old bam files if specified"
+checkFiles @NAME_sorted_picard.bam
+@KEEPREMOVE
+
+
+# Coverage checks
+message "Checking coverage"
+python $salsadir/tools/CoverView-v1.1.0/CoverView.py -i @NAME_sorted_picard.bam -o @NAME_coverview -c @COVERVIEWCONFIG -b @COVERVIEWBED
+
+
+# Platypus
+message "Variant calling"
+python $salsadir/tools/Platypus_0.2.4/Platypus.py callVariants --bamFiles=@NAME_sorted_picard.bam --refFile=@REFERENCE --output=@NAME_All_Calls.vcf --outputRefCalls=1 
+
+
+#Remove REFCALL from All_Calls.vcf
+grep -v REFCALL @NAME_All_Calls.vcf > @NAME_calls.vcf
+
+
+# CAVA
+message "Variant annotation"
+checkFiles @NAME_All_Calls.vcf
+python $salsadir/tools/cava-v1.2.0/cava.py -i @NAME_calls.vcf -c @CAVACONFIG -o @NAME_annotated_calls
+
+
+# Creating output txt file
+message "Converting VCF file to tab-seperated TXT file"
+checkFiles @NAME_annotated_calls.vcf
+python $salsadir/tools/utils/postCAVA.py -i @NAME_annotated_calls.vcf @MOREPOSTCAVA > @NAME_annotated_calls.txt
+
+
+echo "$(date "+%d.%m.%Y %T") : Pipeline finished" >> @NAME_topex_log.txt
+

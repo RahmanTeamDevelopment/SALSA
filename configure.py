@@ -6,29 +6,7 @@ import os
 import sys
 from main.version import __version__
 from main import generate
-
-
-def parse_config_file(fn):
-	ret = {}
-	section = ''
-	with open(fn) as infile:
-		for line in infile:
-			line = line.strip()
-			if line == '' or line.startswith('#') or line.startswith(";"): continue
-			
-			if line[0] == '[' and line[-1] == ']':
-				s = line[1:-1]
-				if '[' in s or ']' in s or '=' in s: continue
-				section = s
-
-			elif line.count('=') == 1:
-				key, value = line.split('=')
-				key = key.strip()
-				value = value.strip()
-				if section != '':
-					key = '{}.{}'.format(section, key)
-				ret[key] = value
-	return ret
+from main import parse_ini
 
 
 ##############################################################################################################
@@ -54,7 +32,7 @@ parser.add_option('--no_indexing', default=False, dest='no_indexing', action='st
 #check if INI file exists and then process it
 ini_dict = {}
 if os.path.isfile(options.salsa_config):
-	ini_dict = parse_config_file(options.salsa_config)
+	ini_dict = parse_ini.read_in(options.salsa_config)
 else:
 	print parser.print_help()
 	sys.exit("\n\nError: SALSA configuration INI file does not exist: %s (--salsa_config)\n\n" %(options.salsa_config))
