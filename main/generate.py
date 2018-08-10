@@ -48,6 +48,7 @@ def topex_configuration(out, ini_dict, ref_with_path, salsa_dir, bed):
 	out_file = open(out,'w')
 	out_file.write("; Configuration file for TOpEx\n")
 	out_file.write("reference="+ref_with_path+"\n")
+	out_file.write("transcript_db="+ini_dict["transcript_db"]+"\n")
 	out_file.write("stampy_index="+salsa_dir+"/index/GRCh37\n")
 	out_file.write("coverview_json="+salsa_dir+"/config_files/coverview_config.json\n")
 	out_file.write("coverview_bed="+bed+"\n")

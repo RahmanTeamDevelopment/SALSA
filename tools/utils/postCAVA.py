@@ -1,4 +1,5 @@
-from __future__ import division
+#!/usr/bin/python
+
 import sys
 import os
 from subprocess import call
@@ -29,6 +30,10 @@ parser = argparse.ArgumentParser(usage="python postCAVA.py <options> -i IN.vcf >
 parser.add_argument('-a', "--all",default=False, dest='all', action='store_true', help="Output all variants, default is to only output variants with a cdot value")
 parser.add_argument('-i', "--infile", default=None, dest="infile", action='store', help="Input VCF file")
 options = parser.parse_args()
+
+if options.infile == None:
+	print parser.print_help()
+	sys.exit("\nError: Please provide an input VCF file (-i)")
 
 fn=options.infile
 prefn=fn[:-4]+'_pre.vcf'

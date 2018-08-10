@@ -62,12 +62,12 @@ checkFiles @NAME_sorted_picard.bam
 
 # Coverage checks
 message "Checking coverage"
-python $salsadir/tools/CoverView-v1.1.0/CoverView.py -i @NAME_sorted_picard.bam -o @NAME_coverview -c @COVERVIEWCONFIG -b @COVERVIEWBED
+$salsadir/tools/CoverView-1.4.3/coverview -i @NAME_sorted_picard.bam -o @NAME_coverview -c @COVERVIEWCONFIG -b @COVERVIEWBED -t @TRANSCRIPTDB
 
 
 # Platypus
 message "Variant calling"
-python $salsadir/tools/Platypus_0.2.4/Platypus.py callVariants --bamFiles=@NAME_sorted_picard.bam --refFile=@REFERENCE --output=@NAME_All_Calls.vcf --outputRefCalls=1 
+$salsadir/tools/Platypus/platypus callVariants --bamFiles=@NAME_sorted_picard.bam --refFile=@REFERENCE --output=@NAME_All_Calls.vcf --outputRefCalls=1 
 
 
 #Remove REFCALL from All_Calls.vcf
@@ -77,7 +77,7 @@ grep -v REFCALL @NAME_All_Calls.vcf > @NAME_calls.vcf
 # CAVA
 message "Variant annotation"
 checkFiles @NAME_All_Calls.vcf
-python $salsadir/tools/cava-v1.2.0/cava.py -i @NAME_calls.vcf -c @CAVACONFIG -o @NAME_annotated_calls
+$salsadir/tools/CAVA-1.2.3/cava -i @NAME_calls.vcf -c @CAVACONFIG -o @NAME_annotated_calls
 
 
 # Creating output txt file

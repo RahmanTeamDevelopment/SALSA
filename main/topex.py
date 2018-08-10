@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import os
 import sys
@@ -78,6 +78,7 @@ params['OUTPATH'] = options.directory
 params['SALSADIR'] = "/".join(scriptdir.split("/")[:-1])
 params['FASTQ1'], params['FASTQ2'] = options.fastqs.split(',')
 params['REFERENCE'] = ini_dict['reference']
+params['TRANSCRIPTDB'] = ini_dict['transcript_db']
 params['STAMPYINDEX'] = ini_dict['stampy_index']
 params['COVERVIEWCONFIG'] = ini_dict['coverview_json']
 params['COVERVIEWBED'] = ini_dict['coverview_bed']
