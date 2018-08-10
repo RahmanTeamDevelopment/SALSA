@@ -2,9 +2,11 @@
 
 import main
 from optparse import OptionParser
-from main.version import __version__
 import os
 import sys
+from sys import argv
+from main.version import __version__
+from main.topex import run_topex
 
 #fix scriptdir so that it points to the path of SALSA and not SALSA/env/bin/
 scriptdir=os.path.dirname(os.path.realpath(__file__))
@@ -26,4 +28,16 @@ if not os.path.isfile(scriptdir+"/config_files/topex_config.ini"):
 ##
 ####################################################################################
 
-print "WORKING ON IT!!!!!!!!!!"
+output_error_message = "\n\nInvalid usage: use SALSA as follows:\n\nsalsa TOpEx [Options]\nsalsa DeCON [Options]\nsalsa QUIC [Options]\n\n"
+if len(argv) <= 1:
+	sys.exit(output_error_message)
+
+if argv[1] == "TOpEx":
+	run_topex(argv)
+elif argv[1] == "DeCON":
+	print "WORKING ON IT!!!!!!!!!!"
+elif argv[1] == "QUIC":
+	print "WORKING ON IT!!!!!!!!!!"
+else:
+	sys.exit(output_error_message)
+
